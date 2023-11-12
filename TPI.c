@@ -3,31 +3,27 @@
 #include <stdlib.h>
 #include <string.h>
 
+float deposito(float *saldo, int clienteActual);
+float extraccion(float *saldo, int clienteActual);
+float transferencia(float *saldo, int clienteActual);
+
 int main()
 {
-    // Definir arrays para almacenar datos de clientes
-    /*int numeroCuenta[10];
-    char contrasenia[10];
-    char nombre[10][50];
-    float saldo[10];
-    char estado[10][10];*/
-    int intentosFallidos[10];
-
-    // Inicializar datos de clientes (esto es un ejemplo, puedes personalizar los datos)
-
+    // Inicializar los datos de los clientes
     int numeroCuenta[10] = {100, 200, 300, 400, 500, 600, 700, 800, 900, 999};
     char contrasenia[10][20] = {"pass1", "pass2", "pass3", "pass4", "pass5", "pass6", "pass7", "pass8", "pass9", "pass99"};
     char nombres[10][50] = {"Matias Rambado", "Nair Gracia", "Carlos Ramirez", "Valeria Perez", "Marcelo Denis", "Nicolas Canil", "Cristian Rodriguez", "Celeste Plano", "Leonela Oricain", "Anita Zapata"};
     float saldo[10] = {450000.0, 598000.0, 700000.0, 999000.0, 190000.0, 267000.0, 350987.0, 123000.0, 98000.0, 568098.0};
     char estadoCuenta[10][10] = {"Activo", "Activo", "Activo", "Activo", "Activo", "Activo", "Activo", "Activo", "Activo", "Activo"};
 
-    // Declarar variables adicionales
+    // Declaracion de variables
     int clienteActual;
     int intentosMaximos;
     int operacionesRealizadas = 0;
     float saldoActual;
     int opcion;
     char contraseniaIngresada[20];
+    int intentosFallidos[10];
 
     // Mostrar mensaje de bienvenida
     printf("Bienvenido al Cajero Autom%ctico\n", 160);
@@ -43,13 +39,13 @@ int main()
     // Verificar credenciales
     if (clienteActual >= 100 && clienteActual <= 999)
     {
-        clienteActual = clienteActual - 100;
+        clienteActual = (clienteActual / 100) - 1;
     }
-    if (strcmp(contrasenia[clienteActual], contraseniaIngresada) == 0 && strcmp(estadoCuenta[clienteActual], "Activo") == 0)
+    if (strcmp(contrasenia[clienteActual - 100], contraseniaIngresada) && strcmp(estadoCuenta[clienteActual - 100], "Activo"))
     {
-        printf("Inicio de sesi%cn exitoso. Bienvenido, %s.\n", nombres[clienteActual], 162);
+        printf("Inicio de sesi%cn exitoso. Bienvenido, %s.\n", 162, nombres[clienteActual]);
         intentosMaximos = 3;
-        intentosFallidos[clienteActual] = 0;
+        intentosFallidos[clienteActual - 100] = 0;
 
         do
         {
@@ -63,30 +59,16 @@ int main()
             printf("Ingrese la opci%cn deseada: ", 162);
             scanf("%d", &opcion);
 
-            // Implementar las operaciones según la opción seleccionada
             switch (opcion)
             {
             case 1:
                 // Realizar un depósito
-                printf("Ingrese la cantidad a depositar: ");
-                float cantidadDeposito;
-                scanf("%f", &cantidadDeposito);
-                saldo[clienteActual] += cantidadDeposito;
+                deposito(saldo, clienteActual);
                 break;
 
             case 2:
                 // Realizar una extracción
-                printf("Ingrese la cantidad a extraer: ");
-                float cantidadExtraccion;
-                scanf("%f", &cantidadExtraccion);
-                if (cantidadExtraccion > saldo[clienteActual])
-                {
-                    printf("Saldo insuficiente. Operaci%cn cancelada.\n", 162);
-                }
-                else
-                {
-                    saldo[clienteActual] -= cantidadExtraccion;
-                }
+                extraccion(saldo, clienteActual);
                 break;
 
             case 3:
@@ -96,34 +78,7 @@ int main()
 
             case 4:
                 // Realizar una transferencia
-                printf("Ingrese el n%cmero de cuenta destino: ",163);
-                int cuentaDestino;
-                scanf("%d", &cuentaDestino);
-
-                // Verificar si la cuenta destino es válida
-                if (cuentaDestino >= 100 && cuentaDestino <= 999 && cuentaDestino != clienteActual + 100)
-                {
-                    printf("Ingrese la cantidad a transferir: ");
-                    float cantidadTransferir;
-                    scanf("%f", &cantidadTransferir);
-
-                    // Verificar si hay suficiente saldo en la cuenta actual
-                    if (cantidadTransferir <= saldo[clienteActual])
-                    {
-                        // Realizar la transferencia
-                        saldo[clienteActual] -= cantidadTransferir;
-                        saldo[cuentaDestino - 100] += cantidadTransferir;
-                        printf("Transferencia exitosa a la cuenta %d.\n", cuentaDestino);
-                    }
-                    else
-                    {
-                        printf("Saldo insuficiente para realizar la transferencia.\n");
-                    }
-                }
-                else
-                {
-                    printf("N%cmero de cuenta destino no v%clido.\n", 163, 160);
-                }
+                transferencia(saldo, clienteActual);
                 break;
 
             case 5:
@@ -142,28 +97,87 @@ int main()
                 break;
             }
 
+            // Sumador de operaciones realizadas
             operacionesRealizadas++;
 
-            // Verificar límite de operaciones
+            // Límite de operaciones
             if (operacionesRealizadas >= 10)
             {
                 printf("Ha alcanzado el l%cmite de operaciones. Gracias.\n", 161);
             }
-        } while (opcion != 6);
+        } while (opcion != 6); // Condicion para salir del bucle
     }
     else
     {
         printf("N%cmero de cuenta o contrase%ca incorrecta.\n", 163, 164);
-        intentosFallidos[clienteActual]++;
+        intentosFallidos[clienteActual - 100]++;
 
-        // Verificar límite de intentos fallidos
-        if (intentosFallidos[clienteActual] >= intentosMaximos)
+        // Límite de intentos fallidos
+        if (intentosFallidos[clienteActual - 100] >= intentosMaximos)
         {
             printf("No se permiten m%cs intentos. Su cuenta ha sido bloqueada; comun%cquese con la entidad bancaria.\n", 160, 161);
-            sprintf(estadoCuenta[clienteActual], "Bloqueado");
+            strcpy(estadoCuenta[clienteActual - 100], "Bloqueado");
         }
     }
-
-    return 0;
     system("pause");
+    return 0;
+}
+
+// Función deposito
+float deposito(float *saldo, int clienteActual)
+{
+    printf("Ingrese la cantidad a depositar: ");
+    float cantidadDeposito;
+    scanf("%f", &cantidadDeposito);
+    saldo[clienteActual] += cantidadDeposito;
+    return saldo[clienteActual];
+}
+
+// Funcion extracción
+float extraccion(float *saldo, int clienteActual)
+{
+    printf("Ingrese la cantidad a extraer: ");
+    float cantidadExtraccion;
+    scanf("%f", &cantidadExtraccion);
+    if (cantidadExtraccion > saldo[clienteActual])
+    {
+        printf("Saldo insuficiente. Operaci%cn cancelada.\n", 162);
+    }
+    else
+    {
+        saldo[clienteActual] -= cantidadExtraccion;
+    }
+}
+
+// Función transferencia
+float transferencia(float *saldo, int clienteActual)
+{
+    printf("Ingrese el n%cmero de cuenta destino: ", 163);
+    int cuentaDestino;
+    scanf("%d", &cuentaDestino);
+
+    // Verificar si la cuenta destino es válida
+    if (cuentaDestino >= 100 && cuentaDestino <= 999 && cuentaDestino != clienteActual + 100)
+    {
+        printf("Ingrese la cantidad a transferir: ");
+        float cantidadTransferir;
+        scanf("%f", &cantidadTransferir);
+
+        // Verificar si hay suficiente saldo en la cuenta actual
+        if (cantidadTransferir <= saldo[clienteActual])
+        {
+            // Realizar la transferencia
+            saldo[clienteActual] -= cantidadTransferir;
+            saldo[cuentaDestino - 100] += cantidadTransferir;
+            printf("Transferencia exitosa a la cuenta %d.\n", cuentaDestino);
+        }
+        else
+        {
+            printf("Saldo insuficiente para realizar la transferencia.\n");
+        }
+    }
+    else
+    {
+        printf("N%cmero de cuenta destino no v%clido.\n", 163, 160);
+    }
 }
